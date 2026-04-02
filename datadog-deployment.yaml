@@ -1,82 +1,55 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.31.2 (a92241f79)
-  creationTimestamp: null
+  name: datadog-agent
   labels:
-    io.kompose.service: datadog
-  name: datadog
+    app: datadog
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: datadog
-  strategy:
-    type: Recreate
+      app: datadog
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert
-        kompose.version: 1.31.2 (a92241f79)
-      creationTimestamp: null
       labels:
-        io.kompose.network/apm-datadog-default: "true"
-        io.kompose.service: datadog
+        app: datadog
     spec:
       containers:
-        - env:
+        - name: dd-agent
+          image: gcr.io/datadoghq/agent:latest
+          env:
             - name: DD_API_KEY
-              value: 1165b9e69897f02a730601d4a37d15ae
+              value: "669ecb7b6205bd6a4debd89e724e7719"
             - name: DD_APM_ENABLED
               value: "true"
+            - name: DD_LOGS_ENABLED
+              value: "true"
             - name: DD_SITE
-              value: us5.datadoghq.com
-            - name: DD_AGENT_HOST
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.hostIP
-            - name: DD_TRACE_AGENT_PORT
-              value: "8126"
-            - name: DD_ENV
-              value: "prod"
-            - name: DD_SERVICE
-              value: "notes-service"
-            - name: DD_VERSION
-              value: "1.0"
-          image: gcr.io/datadoghq/agent:latest
-          name: dd-agent
-          resources: {}
-          volumeMounts:
-            - mountPath: /var/run/docker.sock
-              name: datadog-claim0
-              readOnly: true
-            - mountPath: /host/proc
-              name: datadog-claim1
-              readOnly: true
-            - mountPath: /host/sys/fs/cgroup
-              name: datadog-claim2
-              readOnly: true
+              value: "datadoghq.com"
           resources:
             requests:
-              memory: "128Mi"
               cpu: "100m"
+              memory: "128Mi"
             limits:
-              memory: "512Mi"
-              cpu: "500m"
-      restartPolicy: Always
+              cpu: "300m"
+              memory: "256Mi"
+          volumeMounts:
+            - name: dockersock
+              mountPath: /var/run/docker.sock
+              readOnly: true
+            - name: procdir
+              mountPath: /host/proc
+              readOnly: true
+            - name: cgroups
+              mountPath: /host/sys/fs/cgroup
+              readOnly: true
       volumes:
-        - name: datadog-claim0
-          persistentVolumeClaim:
-            claimName: datadog-claim0
-            readOnly: true
-        - name: datadog-claim1
-          persistentVolumeClaim:
-            claimName: datadog-claim1
-            readOnly: true
-        - name: datadog-claim2
-          persistentVolumeClaim:
-            claimName: datadog-claim2
-            readOnly: true
-status: {}
+        - name: dockersock
+          hostPath:
+            path: /var/run/docker.sock
+        - name: procdir
+          hostPath:
+            path: /proc
+        - name: cgroups
+          hostPath:
+            path: /sys/fs/cgroup

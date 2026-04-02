@@ -1,35 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.31.2 (a92241f79)
-  creationTimestamp: null
-  labels:
-    io.kompose.service: notes-app
   name: notes-app
+  labels:
+    app: notes
 spec:
   replicas: 2
   selector:
     matchLabels:
-      io.kompose.service: notes-app
-  strategy: {}
+      app: notes
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert
-        kompose.version: 1.31.2 (a92241f79)
-      creationTimestamp: null
       labels:
-        io.kompose.network/apm-datadog-default: "true"
-        io.kompose.service: notes-app
+        app: notes
     spec:
       containers:
-        - env:
-            - name: CALENDAR_HOST
-              value: calendar
-            - name: DB_HOST
-              value: db
+        - name: notes-app
+          image: horacio1986/notes-app:latest
+          ports:
+            - containerPort: 5000
+          env:
             - name: DD_AGENT_HOST
               valueFrom:
                 fieldRef:
@@ -39,21 +29,13 @@ spec:
             - name: DD_ENV
               value: "prod"
             - name: DD_SERVICE
-              value: "notes-service"
+              value: "notes-app-service"
             - name: DD_VERSION
-              value: "1.0"    
-          image: horacio1986/notes-app:latest
-          name: notes-app
-          ports:
-            - containerPort: 8080
-              hostPort: 8080
-              protocol: TCP
-          resources: 
+              value: "1.0"
+          resources:
             requests:
-              memory: "128Mi"
               cpu: "100m"
+              memory: "128Mi"
             limits:
-              memory: "512Mi"
-              cpu: "500m"
-      restartPolicy: Always
-status: {}
+              cpu: "250m"
+              memory: "256Mi"

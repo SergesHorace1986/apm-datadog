@@ -1,0 +1,11 @@
+apiVersion: datadoghq.com/v1alpha1
+kind: DatadogMonitor
+metadata:
+  name: k8s-cpu-alert
+spec:
+  type: metric alert
+  query: "avg:kubernetes.cpu.usage.total{*} by {cluster_name} > 0.6"
+  name: "Kubernetes CPU > 60%"
+  message: "CPU usage is above 60% on cluster {{cluster_name}}. Please investigate."
+  tags:
+    - k8s

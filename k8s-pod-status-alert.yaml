@@ -1,0 +1,11 @@
+apiVersion: datadoghq.com/v1alpha1
+kind: DatadogMonitor
+metadata:
+  name: k8s-pod-status-alert
+spec:
+  type: metric alert
+  query: "max:kubernetes.pods.running{*} by {pod_name} < 1"
+  name: "Kubernetes Pod Not Running"
+  message: "Pod {{pod_name}} is not in Running state. Check immediately."
+  tags:
+    - k8s

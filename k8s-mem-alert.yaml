@@ -1,0 +1,11 @@
+apiVersion: datadoghq.com/v1alpha1
+kind: DatadogMonitor
+metadata:
+  name: k8s-mem-alert
+spec:
+  type: metric alert
+  query: "avg:kubernetes.memory.usage.total{*} by {cluster_name} > 0.8"
+  name: "Kubernetes RAM > 80%"
+  message: "Memory usage is above 80% on cluster {{cluster_name}}. Investigate immediately."
+  tags:
+    - k8s

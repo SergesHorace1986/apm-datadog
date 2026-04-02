@@ -25,19 +25,12 @@ spec:
         io.kompose.service: calendar-app
     spec:
       containers:
-        - image: calendar-app
-          name: calendar
+        - image: horacio1986/calendar-app:latest
+          name: calendar-app
           ports:
             - containerPort: 9090
               hostPort: 9090
               protocol: TCP
-          resources: 
-            requests:
-              memory: "128Mi"
-              cpu: "100m"
-            limits:
-              memory: "512Mi"
-              cpu: "500m"
           env:
             - name: DD_AGENT_HOST
               valueFrom:
@@ -51,8 +44,12 @@ spec:
               value: "notes-service"
             - name: DD_VERSION
               value: "1.0"
-
-
-
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
       restartPolicy: Always
 status: {}

@@ -31,8 +31,6 @@ spec:
             - name: DB_HOST
               value: db
             - name: DD_AGENT_HOST
-              value: datadog
-            - name: DD_AGENT_HOST
               valueFrom:
                 fieldRef:
                   fieldPath: status.hostIP
@@ -44,8 +42,8 @@ spec:
               value: "notes-service"
             - name: DD_VERSION
               value: "1.0"    
-          image: notes-app
-          name: notes
+          image: horacio1986/notes-app:latest
+          name: notes-app
           ports:
             - containerPort: 8080
               hostPort: 8080

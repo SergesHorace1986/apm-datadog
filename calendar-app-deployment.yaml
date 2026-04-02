@@ -2,14 +2,14 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert -f docker-compose.yaml
-    kompose.version: 1.26.1 (a9d05d509)
+    kompose.cmd: kompose convert
+    kompose.version: 1.31.2 (a92241f79)
   creationTimestamp: null
   labels:
     io.kompose.service: calendar-app
   name: calendar-app
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       io.kompose.service: calendar-app
@@ -17,10 +17,11 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-compose.yaml
-        kompose.version: 1.26.1 (a9d05d509)
+        kompose.cmd: kompose convert
+        kompose.version: 1.31.2 (a92241f79)
       creationTimestamp: null
       labels:
+        io.kompose.network/apm-datadog-default: "true"
         io.kompose.service: calendar-app
     spec:
       containers:
@@ -28,6 +29,30 @@ spec:
           name: calendar
           ports:
             - containerPort: 9090
-          resources: {}
+              hostPort: 9090
+              protocol: TCP
+          resources: 
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_TRACE_AGENT_PORT
+              value: "8126"
+            - name: DD_ENV
+              value: "prod"
+            - name: DD_SERVICE
+              value: "notes-service"
+            - name: DD_VERSION
+              value: "1.0"
+
+
+
       restartPolicy: Always
 status: {}

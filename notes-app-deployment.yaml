@@ -43,7 +43,7 @@ spec:
             - name: DD_SERVICE
               value: "notes-service"
             - name: DD_VERSION
-    value: "1.0"    
+              value: "1.0"    
           image: notes-app
           name: notes
           ports:
